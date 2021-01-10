@@ -25,7 +25,26 @@ class Repeated(collections.abc.MutableSequence):
     modify the underlying field container directly.
     """
 
-    def __init__(self, sequence, *, marshal):
+    @cached_property
+    def _apb_type(self):
+        """Return the protocol buffer type for this sequence."""
+        # There is no public-interface mechanism to determine the type
+        # of what should go in the list (and the C implementation seems to
+        # have no exposed mechanism at all).
+        #
+        # If the list has members, use the existing list members to
+        # determine the type.
+        if len(self.pb) > 0:
+            return type(self.pb[0])
+
+        # We have no members in the list.
+        # In order to get the type, we create a throw-away copy and add a
+        # blank member to it.
+        canary = copy.deepcopy(self.pb).add()
+        return type(canary)
+
+
+    def __init__(self, sequence, pb_type, *, marshal):
         """Initialize a wrapper around a protobuf repeated field.
 
         Args:
@@ -35,10 +54,11 @@ class Repeated(collections.abc.MutableSequence):
         """
         self._pb = sequence
         self._marshal = marshal
-
+        self._pb_type = pb_type
+        print("AABBCCDDEEFFGG", pb_type, self._apb_type)
     def __copy__(self):
         """Copy this object and return the copy."""
-        return type(self)(self.pb[:], marshal=self._marshal)
+        return type(self)(self.pb[:], self._pb_type, marshal=self._marshal)
 
     def __delitem__(self, key):
         """Delete the given item."""
@@ -85,24 +105,6 @@ class RepeatedComposite(Repeated):
     This implements the full Python MutableSequence interface, but all methods
     modify the underlying field container directly.
     """
-
-    @cached_property
-    def _pb_type(self):
-        """Return the protocol buffer type for this sequence."""
-        # There is no public-interface mechanism to determine the type
-        # of what should go in the list (and the C implementation seems to
-        # have no exposed mechanism at all).
-        #
-        # If the list has members, use the existing list members to
-        # determine the type.
-        if len(self.pb) > 0:
-            return type(self.pb[0])
-
-        # We have no members in the list.
-        # In order to get the type, we create a throw-away copy and add a
-        # blank member to it.
-        canary = copy.deepcopy(self.pb).add()
-        return type(canary)
 
     def __eq__(self, other):
         if super().__eq__(other):

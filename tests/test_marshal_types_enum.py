@@ -43,8 +43,8 @@ def test_to_python():
         BAZ = 2
 
     enum_rule = EnumRule(Foo)
-    foo_a = enum_rule.to_python(1)
-    foo_b = enum_rule.to_python(Foo.BAR)
+    foo_a = enum_rule.to_python(1, Foo)
+    foo_b = enum_rule.to_python(Foo.BAR, Foo)
     assert foo_a is foo_b is Foo.BAR
 
 
@@ -56,5 +56,5 @@ def test_to_python_unknown_value():
 
     enum_rule = EnumRule(Foo)
     with mock.patch.object(warnings, "warn") as warn:
-        assert enum_rule.to_python(4) == 4
+        assert enum_rule.to_python(4, Foo) == 4
         warn.assert_called_once_with("Unrecognized Foo enum value: 4")

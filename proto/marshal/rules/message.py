@@ -20,7 +20,7 @@ class MessageRule:
         self._descriptor = descriptor
         self._wrapper = wrapper
 
-    def to_python(self, value, *, absent: bool = None):
+    def to_python(self, value, pb_type, *, absent: bool = None):
         if isinstance(value, self._descriptor):
             return self._wrapper.wrap(value)
         return value

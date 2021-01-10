@@ -24,13 +24,7 @@ class MapComposite(collections.abc.MutableMapping):
     modify the underlying field container directly.
     """
 
-    @cached_property
-    def _pb_type(self):
-        """Return the protocol buffer type for this sequence."""
-        # Huzzah, another hack. Still less bad than RepeatedComposite.
-        return type(self.pb.GetEntryClass()().value)
-
-    def __init__(self, sequence, *, marshal):
+    def __init__(self, sequence, pb_type, *, marshal):
         """Initialize a wrapper around a protobuf map.
 
         Args:
@@ -40,6 +34,7 @@ class MapComposite(collections.abc.MutableMapping):
         """
         self._pb = sequence
         self._marshal = marshal
+        self._pb_type = pb_type
 
     def __contains__(self, key):
         # Protocol buffers is so permissive that querying for the existence

@@ -32,6 +32,6 @@ def test_to_python():
         bar = proto.Field(proto.INT32, number=1)
 
     message_rule = MessageRule(Foo.pb(), Foo)
-    foo_a = message_rule.to_python(Foo(bar=42))
-    foo_b = message_rule.to_python(Foo.pb()(bar=42))
+    foo_a = message_rule.to_python(Foo(bar=42), Foo)
+    foo_b = message_rule.to_python(Foo.pb()(bar=42), Foo)
     assert foo_a == foo_b

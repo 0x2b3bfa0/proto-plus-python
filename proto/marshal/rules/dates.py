@@ -31,7 +31,7 @@ class TimestampRule:
     """
 
     def to_python(
-        self, value, *, absent: bool = None
+        self, value, pb_type, *, absent: bool = None
     ) -> datetime_helpers.DatetimeWithNanoseconds:
         if isinstance(value, timestamp_pb2.Timestamp):
             if absent:
@@ -58,7 +58,7 @@ class DurationRule:
     proto directly.
     """
 
-    def to_python(self, value, *, absent: bool = None) -> timedelta:
+    def to_python(self, value, pb_type, *, absent: bool = None) -> timedelta:
         if isinstance(value, duration_pb2.Duration):
             return timedelta(
                 days=value.seconds // 86400,

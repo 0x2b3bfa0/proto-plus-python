@@ -26,7 +26,7 @@ class ValueRule:
     def __init__(self, *, marshal):
         self._marshal = marshal
 
-    def to_python(self, value, *, absent: bool = None):
+    def to_python(self, value, pb_type, *, absent: bool = None):
         """Coerce the given value to the appropriate Python type.
 
         Note that both NullValue and absent fields return None.
@@ -86,12 +86,12 @@ class ListValueRule:
     def __init__(self, *, marshal):
         self._marshal = marshal
 
-    def to_python(self, value, *, absent: bool = None):
+    def to_python(self, value, pb_type, *, absent: bool = None):
         """Coerce the given value to a Python sequence."""
         return (
             None
             if absent
-            else repeated.RepeatedComposite(value.values, marshal=self._marshal)
+            else repeated.RepeatedComposite(value.values, pb_type, marshal=self._marshal)
         )
 
     def to_proto(self, value) -> struct_pb2.ListValue:
@@ -114,10 +114,10 @@ class StructRule:
     def __init__(self, *, marshal):
         self._marshal = marshal
 
-    def to_python(self, value, *, absent: bool = None):
+    def to_python(self, value, pb_type, *, absent: bool = None):
         """Coerce the given value to a Python mapping."""
         return (
-            None if absent else maps.MapComposite(value.fields, marshal=self._marshal)
+            None if absent else maps.MapComposite(value.fields, pb_type, marshal=self._marshal)
         )
 
     def to_proto(self, value) -> struct_pb2.Struct:

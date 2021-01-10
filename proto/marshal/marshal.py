@@ -150,22 +150,24 @@ class BaseMarshal:
         self.register(struct_pb2.ListValue, struct.ListValueRule(marshal=self))
         self.register(struct_pb2.Struct, struct.StructRule(marshal=self))
 
-    def to_python(self, proto_type, value, *, absent: bool = None):
+    def to_python(self, proto_type, value, pb_type=None, *, absent: bool = None):
         # Internal protobuf has its own special type for lists of values.
         # Return a view around it that implements MutableSequence.
         value_type = type(value)  # Minor performance boost over isinstance
+        print("FIRSTFIRST", proto_type, value_type)
+
         if value_type in compat.repeated_composite_types:
-            return RepeatedComposite(value, marshal=self)
+            return RepeatedComposite(value, proto_type, marshal=self)
         if value_type in compat.repeated_scalar_types:
-            return Repeated(value, marshal=self)
+            return Repeated(value, proto_type, marshal=self)
 
         # Same thing for maps of messages.
         if value_type in compat.map_composite_types:
-            return MapComposite(value, marshal=self)
+            return MapComposite(value, proto_type, marshal=self)
 
         # Convert ordinary values.
         rule = self._rules.get(proto_type, self._noop)
-        return rule.to_python(value, absent=absent)
+        return rule.to_python(value, proto_type, absent=absent)
 
     def to_proto(self, proto_type, value, *, strict: bool = False):
         # The protos in google/protobuf/struct.proto are exceptional cases,
@@ -257,7 +259,7 @@ class Marshal(BaseMarshal):
 class NoopRule:
     """A catch-all rule that does nothing."""
 
-    def to_python(self, pb_value, *, absent: bool = None):
+    def to_python(self, pb_value, pb_type, *, absent: bool = None):
         return pb_value
 
     def to_proto(self, value):

@@ -26,7 +26,7 @@ class WrapperRule:
     that None becomes a possible value.
     """
 
-    def to_python(self, value, *, absent: bool = None):
+    def to_python(self, value, pb_type, *, absent: bool = None):
         if isinstance(value, self._proto_type):
             if absent:
                 return None

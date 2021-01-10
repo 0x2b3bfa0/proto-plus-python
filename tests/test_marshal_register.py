@@ -27,7 +27,7 @@ def test_registration():
         def to_proto(self, value):
             return value
 
-        def to_python(self, value, *, absent=None):
+        def to_python(self, value, pb_type, *, absent=None):
             return value
 
     assert isinstance(marshal._rules[empty_pb2.Empty], Rule)
@@ -42,7 +42,7 @@ def test_invalid_target_registration():
             def to_proto(self, value):
                 return value
 
-            def to_python(self, value, *, absent=None):
+            def to_python(self, value, pb_type, *, absent=None):
                 return value
 
 

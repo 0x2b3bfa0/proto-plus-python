@@ -23,7 +23,7 @@ class EnumRule:
     def __init__(self, enum_class: Type[enum.IntEnum]):
         self._enum = enum_class
 
-    def to_python(self, value, *, absent: bool = None):
+    def to_python(self, value, pb_type, *, absent: bool = None):
         if isinstance(value, int) and not isinstance(value, self._enum):
             try:
                 # Coerce the int on the wire to the enum value.
